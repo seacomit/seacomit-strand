@@ -7,11 +7,14 @@ interface ParentComponentState {
 }
 
 class StrandViewComponent extends Component<{}, ParentComponentState> {
+  boundHandleResize: (this: Window, ev: UIEvent) => void;
+
   constructor(props: {}) {    
     super(props);
+    this.boundHandleResize = this.handleResize.bind(this);
     this.state = {
       width: window.innerWidth,
-      height: window.innerHeight - 300,
+      height: window.innerHeight,
     }
   }
 
@@ -21,17 +24,17 @@ class StrandViewComponent extends Component<{}, ParentComponentState> {
   }
 
   componentDidMount(): void {
-    window.addEventListener('resize', this.handleResize.bind(this));
+    window.addEventListener('resize', this.boundHandleResize);
   }
 
   componentWillUnmount(): void {
-    window.removeEventListener('resize', this.handleResize.bind(this));
+    window.removeEventListener('resize', this.boundHandleResize);
   }
 
   handleResize(): void {
     this.setState({
       width: window.innerWidth,
-      height: window.innerHeight - 300,
+      height: window.innerHeight,
     });
   }
 }
