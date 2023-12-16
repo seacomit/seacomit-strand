@@ -1,24 +1,25 @@
-import React, { Component, createRef } from 'react';
+import { Component, createRef } from 'react';
+import StrandRenderer from './drawing/StrandRenderer';
 
 class StrandCanvasComponent extends Component {
   canvasRef = createRef<HTMLCanvasElement>();
+  strandRenderer = new StrandRenderer();
+
+  render() {
+    return <canvas ref={this.canvasRef} data-testid="strand-canvas" />;
+  }
 
   componentDidMount() {
     const canvas = this.canvasRef.current;
     if (canvas) {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight - 300;
+      
       const ctx = canvas.getContext('2d');
-      // You can now draw on the canvas
       if (ctx) {
-        ctx.fillStyle = '#140033';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        this.strandRenderer.render(ctx, canvas.width, canvas.height);
       }
     }
-  }8
-
-  render() {
-    return <canvas ref={this.canvasRef} height="500" />;
   }
 }
 
