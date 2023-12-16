@@ -1,7 +1,12 @@
 import { Component, createRef } from 'react';
 import StrandRenderer from './drawing/StrandRenderer';
 
-class StrandCanvasComponent extends Component {
+interface StrandCanvasComponentProps {
+  width: number;
+  height: number;
+}
+
+class StrandCanvasComponent extends Component<StrandCanvasComponentProps> {
   canvasRef = createRef<HTMLCanvasElement>();
   strandRenderer = new StrandRenderer();
 
@@ -9,11 +14,20 @@ class StrandCanvasComponent extends Component {
     return <canvas ref={this.canvasRef} data-testid="strand-canvas" />;
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
+    this.redrawStrand();
+  }
+
+  componentDidUpdate(): void {
+    this.redrawStrand();
+  }
+
+  redrawStrand() {
     const canvas = this.canvasRef.current;
     if (canvas) {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight - 300;
+      const {width, height} = this.props;
+      canvas.width = width;
+      canvas.height = height;
       
       const ctx = canvas.getContext('2d');
       if (ctx) {

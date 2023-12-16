@@ -8,10 +8,14 @@ class StrandRenderer {
         ctx.font = "10px Roboto";
 
         let firstN = 41;
-        let nWidth = 100;
         let index = 0;
 
         let circleRadius = 5;
+        let gapBetweenN = 10;
+
+        let sectionLength = circleRadius * 2 + gapBetweenN;
+
+        const nWidth = (width - width % sectionLength) / sectionLength;
 
         for (let i = index; i < nWidth; i++) {
             const theN = firstN + PrimeMath.triangularN(i) * 2;
@@ -24,7 +28,7 @@ class StrandRenderer {
             }
             const textMetrics = ctx.measureText(displayText);
 
-            const numberScreenPosition = i * circleRadius * 4;
+            const numberScreenPosition = i * sectionLength + gapBetweenN;
             ctx.beginPath();
             ctx.arc(numberScreenPosition, height / 2, circleRadius, 0, 2 * Math.PI);
             ctx.strokeStyle = "#4dffb8";

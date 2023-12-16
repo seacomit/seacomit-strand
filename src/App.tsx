@@ -1,15 +1,14 @@
 import './App.css';
-import StrandCanvasComponent from './StrandCanvasComponent';
+import StrandViewComponent from './StrandViewComponent';
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <title>Seacomit Strand</title>
       </header>
-      <body className="App-body">
-        <StrandCanvasComponent />
-      </body>
+      <div className="App-body">
+        <StrandViewComponent />
+      </div>
     </div>
   );
 }
