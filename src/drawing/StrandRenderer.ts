@@ -1,29 +1,15 @@
+import { off } from "process";
 import PrimeMath from "../primes/PrimeMath";
+
+interface NumberProperties {
+  n: number,
+  prime: boolean,
+  factors: number[];
+}
 
 class StrandRenderer {
 
-    drawArc(ctx: CanvasRenderingContext2D, gapMultiplier: number, radiusMultiplier: number, startAngle: number, endAngle: number, strokeStyle: string, gapBetweenN: number, circleRadius: number, height: number): void {
-      const diameter = circleRadius * 2;  
-      
-      ctx.strokeStyle = strokeStyle;
-        ctx.beginPath();
-        ctx.arc(
-            gapBetweenN + (gapBetweenN * gapMultiplier) + (diameter * gapMultiplier) + diameter * radiusMultiplier, 
-            height / 2, 
-            diameter * radiusMultiplier, 
-            startAngle, 
-            endAngle
-        );
-        ctx.stroke();
-    }
-
-    drawTopArc(ctx: CanvasRenderingContext2D, gapMultiplier: number, radiusMultiplier: number, strokeStyle: string, gapBetweenN: number, circleRadius: number, height: number): void {
-      this.drawArc(ctx, gapMultiplier, radiusMultiplier, Math.PI, Math.PI * 2, strokeStyle, gapBetweenN, circleRadius, height);
-    }
-
-    drawBottomArc(ctx: CanvasRenderingContext2D, gapMultiplier: number, radiusMultiplier: number, strokeStyle: string, gapBetweenN: number, circleRadius: number, height: number): void {
-      this.drawArc(ctx, gapMultiplier, radiusMultiplier, 0, Math.PI, strokeStyle, gapBetweenN, circleRadius, height);
-    }
+    numberCache: NumberProperties[] = [];
 
     render(ctx: CanvasRenderingContext2D, width: number, height: number, offset: number) {
         ctx.fillStyle = '#140033';
@@ -33,40 +19,69 @@ class StrandRenderer {
 
         const firstN = 41;
         const quantity = 100;
+        const highestVisibleN = quantity + offset;
+
+        // Update the cache if necessary.
+        if (highestVisibleN > this.numberCache.length) {
+          // calculate values up to highestVisibleN
+          const startingIndex = this.numberCache.length;
+          const iterations = highestVisibleN - this.numberCache.length;
+          for (let i = 0; i < iterations; i++) {
+            const triN = firstN + PrimeMath.triangularN(startingIndex + i) * 2;
+            const factors = PrimeMath.getPrimeFactors(triN);
+            const numberProperties = {
+              n: triN,
+              prime: factors.length === 1,
+              factors: factors,
+            };
+            this.numberCache.push(numberProperties);
+          }
+        }
 
         const sectionLength = width / quantity;
-
         const circleRadius = sectionLength * 1/3;
         const gapBetweenN = sectionLength * 2/3;
-        //const sectionLength = circleRadius * 2 + gapBetweenN;
-        //const nWidth = (width - width % sectionLength) / sectionLength;
 
         // Draw strand paths.
         ctx.lineWidth = 4;
 
-        for (let i = 0; i < 10; i++) {
-          let triN = firstN;
-          this.drawTopArc(ctx, i, triN, "#33003388", gapBetweenN, circleRadius, height);
-        }
-
-        /*for (let i = 0; i < firstN; i++) {
-          let triN = firstN + PrimeMath.triangularN(offset + i) * 2;
-          if (i % 2 == 1) {
-            this.drawBottomArc(ctx, i, triN - (1 + 2 * (i + offset)), "#00330088", gapBetweenN, circleRadius, height);
-            this.drawBottomArc(ctx, i, triN, "#00330088", gapBetweenN, circleRadius, height);
-          } else {
-            this.drawTopArc(ctx, i, triN - (1 + 2 * (i + offset)), "#33003388", gapBetweenN, circleRadius, height);
-            this.drawTopArc(ctx, i, triN, "#33003388", gapBetweenN, circleRadius, height);
+        let startsBelow = false;
+        for (let p = 0; p < highestVisibleN; p++) {
+          const triN = this.numberCache[p].n;
+          let currentLoop = startsBelow;
+          for (let i = 0; i < 50; i++) {
+            const middlePoint = sectionLength * triN / 2;
+            const multipleOffset = triN * sectionLength * i;
+            const centeredOffset = sectionLength / 2 + circleRadius / 2;
+            const offsetOffset = sectionLength * offset * -1;
+            const triangularOffset = sectionLength * p;
+            const finalOffset = middlePoint + multipleOffset + centeredOffset + offsetOffset + triangularOffset;
+  
+            const color = currentLoop ? "#00330088" : "#33003388";
+            const startAngle = currentLoop ? 0 : Math.PI;
+            const endAngle = currentLoop ? Math.PI : Math.PI * 2;
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.arc(
+                finalOffset, 
+                height / 2, 
+                sectionLength * triN / 2, 
+                startAngle, endAngle
+            );
+            ctx.stroke();
+            currentLoop = !currentLoop;
           }
-        }*/
+          startsBelow = !startsBelow;
+        }
 
         // Draw points and text.
         ctx.lineWidth = 2;
         for (let i = 0; i < quantity; i++) {
-            const pseudoN = offset + i + 1;
-            const theN = firstN + PrimeMath.triangularN(offset + i) * 2;
-            const factors = PrimeMath.getPrimeFactors(theN);
-            const isPrime = factors.length === 1;
+            const pseudoN = offset + i;
+            const numberProperties = this.numberCache[offset + i];
+            const theN = numberProperties.n;
+            const factors = numberProperties.factors;
+            const isPrime = numberProperties.prime;
             const numberScreenPosition = i * sectionLength + gapBetweenN;
 
             // Draw number circle.
@@ -91,17 +106,17 @@ class StrandRenderer {
             ctx.translate(numberScreenPosition -3, height / 2 + textMetrics.width / 2 + circleRadius * 3);
             ctx.rotate(Math.PI/2);
             ctx.textAlign = "center";
-            //ctx.fillText(theN.toString(), numberScreenPosition - (textMetrics.width / 2), height / 2 + 20);
             ctx.fillText(displayText, 0, 0);
             ctx.restore();
 
-            textMetrics = ctx.measureText(pseudoN.toString());
+            const pseudoNMod = pseudoN % firstN + 1;
+            const pseudoNDisplayText = pseudoN + " (" + pseudoNMod +")";
+            textMetrics = ctx.measureText(pseudoNDisplayText);
             ctx.save();
             ctx.translate(numberScreenPosition -3, height / 2 - textMetrics.width / 2 - circleRadius * 3);
             ctx.rotate(Math.PI/2);
             ctx.textAlign = "center";
-            //ctx.fillText(theN.toString(), numberScreenPosition - (textMetrics.width / 2), height / 2 + 20);
-            ctx.fillText(pseudoN.toString(), 0, 0);
+            ctx.fillText(pseudoNDisplayText, 0, 0);
             ctx.restore();
             
         }
