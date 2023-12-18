@@ -4,6 +4,7 @@ import StrandRenderer from './drawing/StrandRenderer';
 interface StrandCanvasComponentProps {
   width: number;
   height: number;
+  offset: number;
 }
 
 class StrandCanvasComponent extends Component<StrandCanvasComponentProps> {
@@ -25,13 +26,13 @@ class StrandCanvasComponent extends Component<StrandCanvasComponentProps> {
   redrawStrand() {
     const canvas = this.canvasRef.current;
     if (canvas) {
-      const {width, height} = this.props;
+      const {width, height, offset} = this.props;
       canvas.width = width;
       canvas.height = height;
       
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        this.strandRenderer.render(ctx, canvas.width, canvas.height);
+        this.strandRenderer.render(ctx, canvas.width, canvas.height, offset);
       }
     }
   }
