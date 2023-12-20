@@ -1,0 +1,36 @@
+.Container {
+    padding: 0;
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+}
+
+.ControlBox {
+    position: fixed;
+    display: inline-block;
+    top: 10px;
+    left: 10px;
+    height: 80px;
+    width: 80vw;
+    text-align: left;
+    background-color: #00000088;
+    border-radius: 8px;
+    z-index: 1;
+}
+
+.InputLabel {
+    margin-left: 12px;
+    font-size: 1rem;
+    font-family: Roboto;
+}
+
+.LockButton {
+    margin-left: 12px;
+}
+
+.LockSequenceText {
+    font-size: 1rem;
+    color: aquamarine;
+    margin-left: 12px;
+    margin-top: 8px;
+}

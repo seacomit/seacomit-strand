@@ -1,10 +1,19 @@
+import './StrandViewComponent.css';
 import { Component } from 'react';
 import StrandCanvasComponent from './StrandCanvasComponent';
+
+interface LockProperties {
+  startN: number;
+  multiplier: number;
+}
 
 interface ParentComponentState {
     width: number;
     height: number;
     offset: number;
+    waveStartN: number;
+    factorLockM: number;
+    lockSequence: LockProperties[];
 }
 
 class StrandViewComponent extends Component<{}, ParentComponentState> {
@@ -19,12 +28,33 @@ class StrandViewComponent extends Component<{}, ParentComponentState> {
       width: window.innerWidth,
       height: window.innerHeight,
       offset: 0,
+      waveStartN: 11,
+      factorLockM: 2,
+      lockSequence: [],
     }
   }
 
   render() {
-    const {width, height, offset} = this.state;
-    return <StrandCanvasComponent width={width} height={height} offset={offset} />;
+    const {width, height, offset, waveStartN, factorLockM} = this.state;
+    function lockPropertiesToString(lockProperties: LockProperties[]):string {
+      let output = "";
+      lockProperties.forEach((lockProp: LockProperties) => {
+        output += " -> " + lockProp.startN + " (" + lockProp.multiplier + ")";
+      });
+      return output;
+    }
+    return <div className="Container">
+             <div className="ControlBox">
+              <label className="InputLabel">Start n: </label>
+              <input type='number' value={waveStartN} onInput={(ev: React.ChangeEvent<HTMLInputElement>) => this.handleStartNInput(ev)} />
+              <label className="InputLabel">Factor Lock Multiple: </label>
+              <input type='number' value={factorLockM} onInput={(ev: React.ChangeEvent<HTMLInputElement>) => this.handleFactorLockMInput(ev)} />
+              <button className="LockButton" onClick={() => this.handleLockClick()}>Lock</button>
+              <button className="LockButton" onClick={() => this.handleUnlockClick()}>Unlock</button>
+              <div className="LockSequenceText">{lockPropertiesToString(this.state.lockSequence)}</div>
+             </div>
+             <StrandCanvasComponent width={width} height={height} offset={offset} />
+           </div>;
   }
 
   componentDidMount(): void {
@@ -35,6 +65,39 @@ class StrandViewComponent extends Component<{}, ParentComponentState> {
   componentWillUnmount(): void {
     window.removeEventListener('resize', this.boundHandleResize);
     window.removeEventListener('keydown', this.boundHandleKeydown);
+  }
+
+  handleLockClick(): void {
+    let lockSequence = this.state.lockSequence;
+    lockSequence.push(
+      {
+        startN: this.state.waveStartN,
+        multiplier: this.state.factorLockM,
+      }
+    );
+    this.setState({
+      lockSequence: lockSequence,
+    });
+  }
+
+  handleUnlockClick(): void {
+    let lockSequence = this.state.lockSequence;
+    lockSequence.pop();
+    this.setState({
+      lockSequence: lockSequence,
+    });
+  }
+
+  handleStartNInput(ev: React.ChangeEvent<HTMLInputElement>): void {
+    this.setState({
+      waveStartN: Number.parseInt(ev.target.value),
+    })
+  }
+
+  handleFactorLockMInput(ev: React.ChangeEvent<HTMLInputElement>): void {
+    this.setState({
+      factorLockM: Number.parseInt(ev.target.value),
+    })
   }
 
   handleKeydown(ev: KeyboardEvent):void {
@@ -64,3 +127,4 @@ class StrandViewComponent extends Component<{}, ParentComponentState> {
 }
 
 export default StrandViewComponent;
+

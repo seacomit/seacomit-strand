@@ -18,7 +18,7 @@ class StrandRenderer {
         ctx.font = "10px Roboto";
 
         const firstN = 17;
-        const quantity = 80;
+        const quantity = 100;
         const highestVisibleN = quantity + offset;
        
         // Update the cache if necessary.
