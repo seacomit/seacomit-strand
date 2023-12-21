@@ -45,9 +45,9 @@ class StrandViewComponent extends Component<{}, ParentComponentState> {
     }
     return <div className="Container">
              <div className="ControlBox">
-              <label className="InputLabel">Start n: </label>
+              <label className="InputLabel">Starting Prime: </label>
               <input type='number' value={waveStartN} onInput={(ev: React.ChangeEvent<HTMLInputElement>) => this.handleStartNInput(ev)} />
-              <label className="InputLabel">Factor Lock Multiple: </label>
+              <label className="InputLabel">Triangular Number Multiple: </label>
               <input type='number' value={factorLockM} onInput={(ev: React.ChangeEvent<HTMLInputElement>) => this.handleFactorLockMInput(ev)} />
               <button className="LockButton" onClick={() => this.handleLockClick()}>Lock</button>
               <button className="LockButton" onClick={() => this.handleUnlockClick()}>Unlock</button>
