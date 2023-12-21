@@ -1,5 +1,7 @@
 class PrimeMath {
     static getPrimeFactors(n: number): number[] {
+        if (n == 0) return [];
+
         let factors: number[] = [];
     
         // Handle 2 separately.

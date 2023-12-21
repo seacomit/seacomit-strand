@@ -6,39 +6,33 @@ import IStrand from "./IStrand";
  * A number series generated using a multiple of the triangular number formula.
  */
 class TriangularStrand implements IStrand {
-    startN: number;
+    startIndex: number;
     multiplier: number;
-    numberCache: INumberProperties[];
+    //numberCache: INumberProperties[];
+    baseStrand: IStrand;
 
-    constructor(startN: number, multiplier: number) {
-        this.startN = startN;
+    constructor(startIndex: number, multiplier: number, baseStrand: IStrand) {
+        this.startIndex = startIndex;
         this.multiplier = multiplier;
-        this.numberCache = [];
+        //this.numberCache = [];
+        this.baseStrand = baseStrand;
     }
 
-    loadUpTo(index: number) {
+    /*loadUpTo(index: number) {
         if (index >= this.numberCache.length) {
-          const startingIndex = this.numberCache.length;
+          const arrayStartIndex = this.numberCache.length;
           const iterations = (index + 1) - this.numberCache.length;
+          this.baseStrand.loadUpTo(this.startIndex + PrimeMath.triangularN(arrayStartIndex + iterations) * this.multiplier);
           for (let i = 0; i < iterations; i++) {
-            const triN = this.startN + PrimeMath.triangularN(startingIndex + i) * this.multiplier;
-            const factors = PrimeMath.getPrimeFactors(triN);
-            const numberProperties = {
-              n: triN,
-              prime: factors.length === 1,
-              factors: factors,
-            };
-            this.numberCache.push(numberProperties);
+            const triIndex = this.startIndex + PrimeMath.triangularN(arrayStartIndex + i) * this.multiplier;
+            this.numberCache.push(this.baseStrand.get(triIndex));
           }
         }
-    }
+    }*/
 
-    get(index: number) {
-        if (index >= this.numberCache.length) {
-            this.loadUpTo(index);
-        }
-
-        return this.numberCache[index];
+    get(index: number): INumberProperties | undefined {
+      const triN = this.startIndex + PrimeMath.triangularN(index) * this.multiplier;
+      return this.baseStrand.get(triN);   
     }
 }
 
