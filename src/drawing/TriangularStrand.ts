@@ -8,31 +8,30 @@ import IStrand from "./IStrand";
 class TriangularStrand implements IStrand {
     startIndex: bigint;
     multiplier: bigint;
-    //numberCache: INumberProperties[];
     baseStrand: IStrand;
+    numberLine: INumberProperties[];
 
     constructor(startIndex: bigint, multiplier: bigint, baseStrand: IStrand) {
         this.startIndex = startIndex;
         this.multiplier = multiplier;
-        //this.numberCache = [];
         this.baseStrand = baseStrand;
+        this.numberLine = [];
     }
 
-    /*loadUpTo(index: number) {
-        if (index >= this.numberCache.length) {
-          const arrayStartIndex = this.numberCache.length;
-          const iterations = (index + 1) - this.numberCache.length;
-          this.baseStrand.loadUpTo(this.startIndex + PrimeMath.triangularN(arrayStartIndex + iterations) * this.multiplier);
+    loadUpTo(index: number) {
+        if (index >= this.numberLine.length) {
+          const arrayStartIndex = this.numberLine.length;
+          const iterations = (index + 1) - this.numberLine.length;
           for (let i = 0; i < iterations; i++) {
-            const triIndex = this.startIndex + PrimeMath.triangularN(arrayStartIndex + i) * this.multiplier;
-            this.numberCache.push(this.baseStrand.get(triIndex));
+            const triIndex = this.startIndex + PrimeMath.triangularN(BigInt(arrayStartIndex + i)) * this.multiplier;
+            this.numberLine.push(this.baseStrand.get(triIndex));
           }
         }
-    }*/
+    }
 
-    get(index: bigint): INumberProperties | undefined {
+    get(index: bigint): INumberProperties {
       const triN = this.startIndex + PrimeMath.triangularN(index) * this.multiplier;
-      return this.baseStrand.get(triN);   
+      return this.baseStrand.get(triN)!;   
     }
 }
 

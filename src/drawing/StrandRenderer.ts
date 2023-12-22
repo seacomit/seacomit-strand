@@ -45,7 +45,7 @@ class StrandRenderer {
         // Draw strand paths.
         ctx.lineWidth = 8;
 
-        let startsBelow = false;
+        /*let startsBelow = false;
         for (let p = 0; p < highestVisibleN; p++) {
           const triN = this.numberCache[p].n;
           let currentLoop = startsBelow;
@@ -96,7 +96,7 @@ class StrandRenderer {
             currentLoop = !currentLoop;
           }
           startsBelow = !startsBelow;
-        }
+        }*/
 
         // Draw points and text.
         ctx.lineWidth = 2;

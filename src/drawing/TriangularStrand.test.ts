@@ -6,17 +6,17 @@ test('TriangularStrand can be constructed.', () => {
   const ts = new TriangularStrand(11n, 2n, new NumberLineStrand());
 });
 
-/*test('TriangularStrand loads numbers correctly.', () => {
-  const ts = new TriangularStrand(11, 2, new NumberLineStrand());
+test('TriangularStrand loads numbers correctly.', () => {
+  const ts = new TriangularStrand(11n, 2n, new NumberLineStrand());
   ts.loadUpTo(99);   
-  expect(ts.numberCache.length).toEqual(100);
+  expect(ts.numberLine.length).toEqual(100);
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0n; i < 100n; i++) {
     const numberProps = ts.get(i);
-    expect(numberProps.n).toEqual(11 + PrimeMath.triangularN(i) * 2);
+    expect(numberProps.n).toEqual(11n + PrimeMath.triangularN(i) * 2n);
   }
-  expect(ts.numberCache.length).toEqual(100);
-});*/
+  expect(ts.numberLine.length).toEqual(100);
+});
 
 test('TriangularStrand returns numbers correctly.', () => {
   const ts = new TriangularStrand(11n, 2n, new NumberLineStrand());
