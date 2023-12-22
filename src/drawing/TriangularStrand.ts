@@ -6,12 +6,12 @@ import IStrand from "./IStrand";
  * A number series generated using a multiple of the triangular number formula.
  */
 class TriangularStrand implements IStrand {
-    startIndex: number;
-    multiplier: number;
+    startIndex: bigint;
+    multiplier: bigint;
     //numberCache: INumberProperties[];
     baseStrand: IStrand;
 
-    constructor(startIndex: number, multiplier: number, baseStrand: IStrand) {
+    constructor(startIndex: bigint, multiplier: bigint, baseStrand: IStrand) {
         this.startIndex = startIndex;
         this.multiplier = multiplier;
         //this.numberCache = [];
@@ -30,7 +30,7 @@ class TriangularStrand implements IStrand {
         }
     }*/
 
-    get(index: number): INumberProperties | undefined {
+    get(index: bigint): INumberProperties | undefined {
       const triN = this.startIndex + PrimeMath.triangularN(index) * this.multiplier;
       return this.baseStrand.get(triN);   
     }
