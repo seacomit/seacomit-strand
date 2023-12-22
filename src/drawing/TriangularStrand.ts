@@ -33,6 +33,10 @@ class TriangularStrand implements IStrand {
       const triN = this.startIndex + PrimeMath.triangularN(index) * this.multiplier;
       return this.baseStrand.get(triN)!;   
     }
+
+    getLine(): INumberProperties[] {
+      return this.numberLine;
+    }
 }
 
 export default TriangularStrand;

@@ -47,6 +47,10 @@ class NumberLineStrand implements IStrand {
 
       return this.numberCache.get(index)!;
     }
+
+    getLine(): INumberProperties[] {
+      return this.numberLine;
+    }
 }
 
 export default NumberLineStrand;
