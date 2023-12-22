@@ -7,10 +7,10 @@ import IStrand from "./IStrand";
  */
 class NumberLineStrand implements IStrand {
     //numberCache: INumberProperties[];
-    numberCache: Map<number, INumberProperties>;
+    numberCache: Map<bigint, INumberProperties>;
 
     constructor() {
-        this.numberCache = new Map<number, INumberProperties>();
+        this.numberCache = new Map<bigint, INumberProperties>();
     }
 
     /*loadUpTo(index: number) {
@@ -30,7 +30,7 @@ class NumberLineStrand implements IStrand {
         }
     }*/
 
-    get(index: number): INumberProperties | undefined {
+    get(index: bigint): INumberProperties | undefined {
       if (!this.numberCache.has(index)) {
         const factors = PrimeMath.getPrimeFactors(index);
           const numberProperties = {

@@ -1,49 +1,51 @@
 class PrimeMath {
-    static getPrimeFactors(n: number): number[] {
-        if (n == 0) return [];
+    static getPrimeFactors(n: bigint): bigint[] {
+        if (n == 0n) return [];
 
-        let factors: number[] = [];
+        let factors: bigint[] = [];
     
         // Handle 2 separately.
-        while (n % 2 === 0) {
-            factors.push(2);
-            n = n / 2;
+        const two: bigint = 2n;
+        const zero: bigint = 0n;
+        while (n % two === zero) {
+            factors.push(two);
+            n = n / two;
         }
     
         // Check for odd numbers.
-        for (let i = 3; i <= Math.sqrt(n); i += 2) {
-            while (n % i === 0) {
+        for (let i = 3n; i * i <= n; i += 2n) {
+            while (n % i === 0n) {
                 factors.push(i);
                 n = n / i;
             }
         }
     
         // If n becomes a prime number greater than 2.
-        if (n > 2) {
+        if (n > 2n) {
             factors.push(n);
         }
     
         return factors;
     }
 
-    static isPrime(n: number): boolean {
+    static isPrime(n: bigint): boolean {
         // Check for less than 2 and for 2 and 3 directly.
-        if (n < 2) return false;
-        if (n === 2 || n === 3) return true;
+        if (n < 2n) return false;
+        if (n === 2n || n === 3n) return true;
     
         // Eliminate multiples of 2 and 3.
-        if (n % 2 === 0 || n % 3 === 0) return false;
+        if (n % 2n === 0n || n % 3n === 0n) return false;
     
         // Check for divisors from 5 to sqrt(n), stepping by 6.
-        for (let i = 5; i * i <= n; i += 6) {
-            if (n % i === 0 || n % (i + 2) === 0) return false;
+        for (let i = 5n; i * i <= n; i += 6n) {
+            if (n % i === 0n || n % (i + 2n) === 0n) return false;
         }
     
         return true;
     }
 
-    static triangularN(n:number): number {
-        return (n * (n + 1)) / 2;
+    static triangularN(n:bigint): bigint {
+        return (n * (n + 1n)) / 2n;
     }
 }
 

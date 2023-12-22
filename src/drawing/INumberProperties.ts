@@ -1,7 +1,7 @@
 interface INumberProperties {
-  n: number,
+  n: bigint,
   prime: boolean,
-  factors: number[];
+  factors: bigint[];
 }
 
 export default INumberProperties;

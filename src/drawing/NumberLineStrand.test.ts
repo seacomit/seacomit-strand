@@ -19,7 +19,7 @@ test('Number line strand can be constructed.', () => {
 test('Number line returns numbers correctly.', () => {
   const nls = new NumberLineStrand();
 
-  for (let i = 0; i < 99; i++) {
+  for (let i = 0n; i < 99n; i++) {
     const numberProps = nls.get(i);
     expect(numberProps!.n).toEqual(i);
   }

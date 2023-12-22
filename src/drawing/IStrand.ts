@@ -2,7 +2,7 @@ import INumberProperties from "./INumberProperties";
 
 interface IStrand {
     //loadUpTo: (index: number) => void;
-    get: (index: number) => INumberProperties | undefined;
+    get: (index: bigint) => INumberProperties | undefined;
 }
 
 export default IStrand;

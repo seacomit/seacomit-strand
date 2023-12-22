@@ -2,9 +2,9 @@ import { off } from "process";
 import PrimeMath from "../primes/PrimeMath";
 
 interface NumberProperties {
-  n: number,
+  n: bigint,
   prime: boolean,
-  factors: number[];
+  factors: bigint[];
 }
 
 class StrandRenderer {
@@ -17,17 +17,17 @@ class StrandRenderer {
 
         ctx.font = "10px Roboto";
 
-        const firstN = 17;
+        const firstN = 17n;
         const quantity = 100;
         const highestVisibleN = quantity + offset;
        
         // Update the cache if necessary.
         if (highestVisibleN > this.numberCache.length) {
           // calculate values up to highestVisibleN
-          const startingIndex = this.numberCache.length;
+          const startingIndex = BigInt(this.numberCache.length);
           const iterations = highestVisibleN - this.numberCache.length;
-          for (let i = 0; i < iterations; i++) {
-            const triN = firstN + PrimeMath.triangularN(startingIndex + i) * 2;
+          for (let i = 0n; i < iterations; i++) {
+            const triN = firstN + PrimeMath.triangularN(startingIndex + i) * 2n;
             const factors = PrimeMath.getPrimeFactors(triN);
             const numberProperties = {
               n: triN,
@@ -51,9 +51,9 @@ class StrandRenderer {
           let currentLoop = startsBelow;
           const sqrInc = p * 2 + 1; // 1, 3, 5, 7, 9, 11, 13...
           for (let i = 0; i < 50; i++) {
-            const multipleOffset = triN * sectionLength * i;
+            const multipleOffset = Number(triN) * sectionLength * i;
             
-            const largeArcSize = triN - sqrInc;
+            const largeArcSize = Number(triN) - sqrInc;
             
             const laMiddlePoint = sectionLength * largeArcSize / 2;
             const centeredOffset = sectionLength / 2 + circleRadius / 2;
@@ -133,7 +133,7 @@ class StrandRenderer {
             ctx.fillText(displayText, 0, 0);
             ctx.restore();
 
-            const pseudoNMod = pseudoN % firstN + 1;
+            const pseudoNMod = pseudoN % Number(firstN) + 1;
             const pseudoNDisplayText = pseudoN + " (" + pseudoNMod +")";
             textMetrics = ctx.measureText(pseudoNDisplayText);
             ctx.save();
