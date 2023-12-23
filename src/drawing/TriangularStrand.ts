@@ -39,7 +39,7 @@ class TriangularStrand implements IStrand {
     }
 
     toString(): string {
-      return `${this.startIndex} (${this.multiplier})`;
+      return this.baseStrand.toString() + ` -> ${this.startIndex} (${this.multiplier})`;
     }
 }
 

@@ -4,6 +4,7 @@ import StrandCanvasComponent from './StrandCanvasComponent';
 import NumberLineStrand from './drawing/NumberLineStrand';
 import IStrand from './drawing/IStrand';
 import TriangularStrand from './drawing/TriangularStrand';
+import StrandFactory from './drawing/StrandFactory';
 
 interface StrandViewComponentState {
     width: number;
@@ -11,12 +12,14 @@ interface StrandViewComponentState {
     offset: number;
     waveStartN: number;
     factorLockM: number;
-    lockSequence: IStrand[];
+    currentStrand: IStrand;
+    isWorking: boolean;
 }
 
 class StrandViewComponent extends Component<{}, StrandViewComponentState> {
   boundHandleResize: (this: Window, ev: UIEvent) => void;
   boundHandleKeydown: (this: Window, ev: KeyboardEvent) => void;
+  worker: Worker;
 
   constructor(props: {}) {    
     super(props);
@@ -28,30 +31,25 @@ class StrandViewComponent extends Component<{}, StrandViewComponentState> {
       offset: 0,
       waveStartN: 11,
       factorLockM: 2,
-      lockSequence: [new NumberLineStrand()],
+      currentStrand: new NumberLineStrand(),
+      isWorking: false,
     }
+    this.worker = new Worker(new URL("./primes/MathWorker.ts", import.meta.url));
   }
 
   render() {
     const {width, height, offset, waveStartN, factorLockM} = this.state;
-    function lockSequenceToString(lockSequence: IStrand[]):string {
-      let output = "";
-      lockSequence.forEach((strand: IStrand) => {
-        output += " -> " + strand.toString();
-      });
-      return output;
-    }
     return <div className="Container">
              <div className="ControlBox">
               <label className="InputLabel">Starting Prime: </label>
               <input type='number' value={waveStartN} onInput={(ev: React.ChangeEvent<HTMLInputElement>) => this.handleStartNInput(ev)} />
               <label className="InputLabel">Triangular Number Multiple: </label>
               <input type='number' value={factorLockM} onInput={(ev: React.ChangeEvent<HTMLInputElement>) => this.handleFactorLockMInput(ev)} />
-              <button className="LockButton" onClick={() => this.handleLockClick()}>Lock</button>
-              <button className="LockButton" onClick={() => this.handleUnlockClick()}>Unlock</button>
-              <div className="LockSequenceText">{lockSequenceToString(this.state.lockSequence)}</div>
+              <button className="LockButton" onClick={() => this.handleLockClick()}>{this.state.isWorking ? "Cancel" : "Lock"}</button>
+              <button disabled={this.state.isWorking || (this.state.currentStrand as TriangularStrand) == null} className="LockButton" onClick={() => this.handleUnlockClick()}>Unlock</button>
+              <div className="LockSequenceText">{this.state.currentStrand.toString()}</div>
              </div>
-             <StrandCanvasComponent width={width} height={height} offset={offset} strand={this.state.lockSequence[this.state.lockSequence.length - 1]} />
+             <StrandCanvasComponent width={width} height={height} offset={offset} strand={this.state.currentStrand} />
            </div>;
   }
 
@@ -66,19 +64,45 @@ class StrandViewComponent extends Component<{}, StrandViewComponentState> {
   }
 
   handleLockClick(): void {
-    let lockSequence = this.state.lockSequence;
-    lockSequence.push(new TriangularStrand(BigInt(this.state.waveStartN), BigInt(this.state.factorLockM), this.state.lockSequence[this.state.lockSequence.length - 1]));
-    this.setState({
-      lockSequence: lockSequence,
-    });
+    if (this.state.isWorking) {
+      this.worker.terminate();
+      this.worker = new Worker(new URL("./primes/MathWorker.ts", import.meta.url));
+      this.setState({
+        isWorking: false,
+      });
+    } else {
+      // Send data to worker
+      this.worker.postMessage(new TriangularStrand(BigInt(this.state.waveStartN), BigInt(this.state.factorLockM), this.state.currentStrand));
+      
+      this.setState({
+        isWorking: true,
+      });
+
+      // Listen for messages from the worker
+      this.worker.onmessage = (event) => {
+        const strandFactory = new StrandFactory();
+        this.setState({
+          currentStrand: strandFactory.build(event.data),
+          offset: 0,
+          isWorking: false,
+        });
+      };
+      
+      // Listen for any errors from the worker
+      this.worker.onerror = (event) => {
+          console.error("Worker error: ", event.message);
+          this.setState({
+            isWorking: false,
+          });
+      };
+    }
   }
 
   handleUnlockClick(): void {
-    let lockSequence = this.state.lockSequence;
-    if (lockSequence.length > 1) {
-      lockSequence.pop();
+    let currentStrand = this.state.currentStrand;
+    if (currentStrand as TriangularStrand != null) {
       this.setState({
-        lockSequence: lockSequence,
+        currentStrand: (currentStrand as TriangularStrand).baseStrand,
       });
     }
   }
