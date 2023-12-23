@@ -37,6 +37,10 @@ class TriangularStrand implements IStrand {
     getLine(): INumberProperties[] {
       return this.numberLine;
     }
+
+    toString(): string {
+      return `${this.startIndex} (${this.multiplier})`;
+    }
 }
 
 export default TriangularStrand;

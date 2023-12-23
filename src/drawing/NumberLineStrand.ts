@@ -51,6 +51,10 @@ class NumberLineStrand implements IStrand {
     getLine(): INumberProperties[] {
       return this.numberLine;
     }
+
+    toString(): string {
+      return "NumberLine";
+    }
 }
 
 export default NumberLineStrand;
