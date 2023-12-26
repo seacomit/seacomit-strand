@@ -34,6 +34,7 @@ class StrandViewComponent extends Component<{}, StrandViewComponentState> {
       currentStrand: new NumberLineStrand(),
       isWorking: false,
     }
+    this.state.currentStrand.loadUpTo(99);
     this.worker = new Worker(new URL("./primes/MathWorker.ts", import.meta.url));
   }
 
@@ -127,6 +128,11 @@ class StrandViewComponent extends Component<{}, StrandViewComponentState> {
     } else if (ev.key === 'ArrowRight') {
       // Right arrow key pressed
       offset++;
+    }
+
+    const currentStrand = this.state.currentStrand;
+    if (currentStrand.getLine().length < (offset + 100)) {
+      currentStrand.loadUpTo(currentStrand.getLine().length + 100);
     }
 
     this.setState({

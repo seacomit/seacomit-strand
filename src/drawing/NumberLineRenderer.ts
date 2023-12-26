@@ -1,8 +1,8 @@
-import IStrand from "./IStrand";
+import INumberProperties from "./INumberProperties";
 
-class StrandRenderer {
+class NumberLineRenderer {
 
-    render(strand: IStrand, ctx: CanvasRenderingContext2D, width: number, height: number, offset: number) {
+    render(numberLine: INumberProperties[], offset: number, ctx: CanvasRenderingContext2D, width: number, height: number) {
         ctx.fillStyle = '#050008';//'#140033';
         ctx.fillRect(0, 0, width, height);
 
@@ -10,12 +10,10 @@ class StrandRenderer {
         const sectionLength = width / quantity;
         const circleRadius = sectionLength * 1/3;
         const gapBetweenN = sectionLength * 2/3;
-
-        strand.loadUpTo(quantity + offset);
-        const numberLine = strand.getLine();
-        const firstN = numberLine[0].n;
-
+        
         // Draw points and text.
+        const firstN = numberLine[0].n;
+        
         ctx.lineWidth = 2;
         ctx.font = "10px Roboto";
         for (let i = 0; i < quantity; i++) {
@@ -64,4 +62,4 @@ class StrandRenderer {
     }
 }
 
-export default StrandRenderer;
+export default NumberLineRenderer;
