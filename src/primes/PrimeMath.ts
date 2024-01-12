@@ -66,11 +66,16 @@ class PrimeMath {
                 }
             }
         }
+
+        if (this.primeCache.length < amount) {
+            this.loadMorePrimes(amount, offset + amount);
+        }
     }
 
     static calculateLockedPrimeFactors(startN:bigint, triangularMult:bigint, amount:number, offset:number) {
         this.loadMorePrimes(amount, offset);
         const lockedFactors = [];
+        const notLockedFactors = [startN];
 
         for (let i = 0; i < amount; i++) {
             const prime = BigInt(this.primeCache[i]);
@@ -83,8 +88,8 @@ class PrimeMath {
                 let locked = true;
                 for (let x = 0n; x < prime; x++) {
                     const triangularN = this.triangularN(x) * triangularMult;
-                    runningPartial = (runningPartial + triangularN) % prime;
-                    if (runningPartial == 0n) {
+                    const triPartial = (startN + triangularN) % prime;
+                    if (triPartial == 0n) {
                         // This factor is not locked, don't bother calculating more.
                         locked = false;
                         break;
@@ -92,11 +97,13 @@ class PrimeMath {
                 }
                 if (locked) {
                     lockedFactors.push(prime);
+                } else {
+                    notLockedFactors.push(prime);
                 }
             }
         }
 
-        return lockedFactors;
+        return [lockedFactors, notLockedFactors];
     }
 }
 

@@ -5,6 +5,7 @@ import NumberLineStrand from './drawing/NumberLineStrand';
 import IStrand from './drawing/IStrand';
 import TriangularStrand from './drawing/TriangularStrand';
 import StrandFactory from './drawing/StrandFactory';
+import PrimeMath from './primes/PrimeMath';
 
 interface StrandViewComponentState {
     width: number;
@@ -14,6 +15,8 @@ interface StrandViewComponentState {
     factorLockM: number;
     currentStrand: IStrand;
     isWorking: boolean;
+    lockedFactors: bigint[];
+    notLockedFactors: bigint[];
 }
 
 class StrandViewComponent extends Component<{}, StrandViewComponentState> {
@@ -33,6 +36,8 @@ class StrandViewComponent extends Component<{}, StrandViewComponentState> {
       factorLockM: 2,
       currentStrand: new NumberLineStrand(),
       isWorking: false,
+      lockedFactors: [],
+      notLockedFactors: [],
     }
     this.state.currentStrand.loadUpTo(99);
     this.worker = new Worker(new URL("./primes/MathWorker.ts", import.meta.url));
@@ -49,6 +54,8 @@ class StrandViewComponent extends Component<{}, StrandViewComponentState> {
               <button className="LockButton" onClick={() => this.handleLockClick()}>{this.state.isWorking ? "Cancel" : "Lock"}</button>
               <button disabled={this.state.isWorking || (this.state.currentStrand as TriangularStrand) == null} className="LockButton" onClick={() => this.handleUnlockClick()}>Unlock</button>
               <div className="LockSequenceText">{this.state.currentStrand.toString()}</div>
+              <div className="LockedFactors">Locked: {this.state.lockedFactors.join(",")}</div>
+              <div className="NotLockedFactors">Not Locked: {this.state.notLockedFactors.join(",")}</div>
              </div>
              <StrandCanvasComponent width={width} height={height} offset={offset} strand={this.state.currentStrand} />
            </div>;
@@ -82,10 +89,13 @@ class StrandViewComponent extends Component<{}, StrandViewComponentState> {
       // Listen for messages from the worker
       this.worker.onmessage = (event) => {
         const strandFactory = new StrandFactory();
+        const result = PrimeMath.calculateLockedPrimeFactors(BigInt(this.state.waveStartN), BigInt(this.state.factorLockM), 250, 0);
         this.setState({
           currentStrand: strandFactory.build(event.data),
           offset: 0,
           isWorking: false,
+          lockedFactors: result[0],
+          notLockedFactors: result[1],
         });
       };
       

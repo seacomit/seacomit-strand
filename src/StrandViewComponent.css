@@ -34,3 +34,17 @@
     margin-left: 12px;
     margin-top: 8px;
 }
+
+.LockedFactors {
+    font-size: 1rem;
+    color: aquamarine;
+    margin-left: 12px;
+    margin-top: 8px;
+}
+
+.NotLockedFactors {
+    font-size: 1rem;
+    color: rgb(170, 49, 119);
+    margin-left: 12px;
+    margin-top: 8px;
+}
