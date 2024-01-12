@@ -1,4 +1,9 @@
+import { off } from "process";
+
 class PrimeMath {
+
+    static primeCache = [2,3,5,7,11,13,17,19,23,29,31,37];
+
     static getPrimeFactors(n: bigint): bigint[] {
         if (n == 0n) return [];
 
@@ -46,6 +51,52 @@ class PrimeMath {
 
     static triangularN(n:bigint): bigint {
         return (n * (n + 1n)) / 2n;
+    }
+
+
+    static loadMorePrimes(amount:number, offset:number) {
+        const primesToCalcUpTo = offset + amount;
+        const highestPrimeInCache = this.primeCache[this.primeCache.length - 1];
+        if (highestPrimeInCache < primesToCalcUpTo) {
+            for (let i = 0; i < primesToCalcUpTo; i++) {
+                const nToCheck = i + highestPrimeInCache + 1;
+                if (this.isPrime(BigInt(nToCheck))) {
+                    // Its prime, add to prime cache.
+                    this.primeCache.push(nToCheck);
+                }
+            }
+        }
+    }
+
+    static calculateLockedPrimeFactors(startN:bigint, triangularMult:bigint, amount:number, offset:number) {
+        this.loadMorePrimes(amount, offset);
+        const lockedFactors = [];
+
+        for (let i = 0; i < amount; i++) {
+            const prime = BigInt(this.primeCache[i]);
+            const partial = startN % prime;
+            if (partial == 0n) {
+                // not locked, starting on a multiple
+            } else {
+                // need to run the sequence up to prime times( maybe only half because it mirrors?)
+                let runningPartial = partial;
+                let locked = true;
+                for (let x = 0n; x < prime; x++) {
+                    const triangularN = this.triangularN(x) * triangularMult;
+                    runningPartial = (runningPartial + triangularN) % prime;
+                    if (runningPartial == 0n) {
+                        // This factor is not locked, don't bother calculating more.
+                        locked = false;
+                        break;
+                    }
+                }
+                if (locked) {
+                    lockedFactors.push(prime);
+                }
+            }
+        }
+
+        return lockedFactors;
     }
 }
 
