@@ -2,20 +2,19 @@
     padding: 0;
     margin: 0;
     height: 100vh;
-    width: 100vw;
+    width: 100%;
 }
 
 .ControlBox {
     position: fixed;
     display: inline-block;
     top: 10px;
-    left: 10px;
     height: 80px;
-    width: 80vw;
     text-align: left;
     background-color: #00000088;
     border-radius: 8px;
     z-index: 1;
+    width: 100%;
 }
 
 .InputLabel {
@@ -25,7 +24,21 @@
 }
 
 .LockButton {
-    margin-left: 12px;
+  margin-left: 12px;
+  background-color: #04AA6D; /* Green */
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+.LockButton:hover {
+    background-color: #3385ff; /* Green */
+    color: white;
 }
 
 .LockSequenceText {
@@ -35,16 +48,52 @@
     margin-top: 8px;
 }
 
-.LockedFactors {
-    font-size: 1rem;
-    color: aquamarine;
-    margin-left: 12px;
-    margin-top: 8px;
+.LockedFactorItem, .NotLockedFactorItem {
+    border-radius: 8px;
+    padding: 0 10px ;
+    display: inline-block;
 }
 
-.NotLockedFactors {
+.LockedFactors {
     font-size: 1rem;
-    color: rgb(170, 49, 119);
-    margin-left: 12px;
     margin-top: 8px;
+    margin-left: 8px;
+    max-height: 120px;
+    width: 95%;
+    overflow-y: scroll;
+    border-color: #3385ff;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 4px;
+    padding: 8px;
 }
+
+.LockedFactorItem {
+    color: aquamarine;
+    background-color: #32a852;
+}
+
+.NotLockedFactorItem {
+    color: #ff5e87;
+    background-color: #a83250;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #555;
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #3385ff;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4dffb8;
+  }

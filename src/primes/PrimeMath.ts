@@ -1,4 +1,5 @@
 import { off } from "process";
+import IFactorLockTest from "./FactorLockTest";
 
 class PrimeMath {
 
@@ -72,9 +73,9 @@ class PrimeMath {
         }
     }
 
-    static calculateLockedPrimeFactors(startN:bigint, triangularMult:bigint, amount:number, offset:number) {
+    static calculateLockedPrimeFactors(startN:bigint, triangularMult:bigint, amount:number, offset:number): IFactorLockTest[] {
         this.loadMorePrimes(amount, offset);
-        const lockedFactors = [];
+        const factorLockTests = [];
         const notLockedFactors = [startN];
 
         for (let i = 0; i < amount; i++) {
@@ -84,7 +85,6 @@ class PrimeMath {
                 // not locked, starting on a multiple
             } else {
                 // need to run the sequence up to prime times( maybe only half because it mirrors?)
-                let runningPartial = partial;
                 let locked = true;
                 for (let x = 0n; x < prime; x++) {
                     const triangularN = this.triangularN(x) * triangularMult;
@@ -96,14 +96,26 @@ class PrimeMath {
                     }
                 }
                 if (locked) {
-                    lockedFactors.push(prime);
+                    factorLockTests.push({
+                        remainder: partial,
+                        divisor: prime,
+                        locked: true,
+                    });
                 } else {
-                    notLockedFactors.push(prime);
+                    factorLockTests.push({
+                        remainder: partial,
+                        divisor: prime,
+                        locked: false,
+                    });
                 }
             }
         }
 
-        return [lockedFactors, notLockedFactors];
+        return factorLockTests;
+    }
+
+    static calculateFactorLockSets() {
+        
     }
 }
 
