@@ -81,19 +81,30 @@
 /* width */
 ::-webkit-scrollbar {
     width: 10px;
-  }
-  
-  /* Track */
-  ::-webkit-scrollbar-track {
+}
+
+/* Track */
+::-webkit-scrollbar-track {
     background: #555;
-  }
-  
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
     background: #3385ff;
-  }
-  
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
     background: #4dffb8;
-  }
+}
+
+.LoadingOverlay {
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    justify-content: center;    
+    width: 100vw;
+    height: 100vh;
+    background-color: #00000088;
+    z-index: 10;
+}

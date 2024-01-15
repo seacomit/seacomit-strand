@@ -7,6 +7,7 @@ import TriangularStrand from './drawing/TriangularStrand';
 import StrandFactory from './drawing/StrandFactory';
 import PrimeMath from './primes/PrimeMath';
 import IFactorLockTest from './primes/FactorLockTest';
+import { off } from 'process';
 
 interface StrandViewComponentState {
     width: number;
@@ -45,12 +46,20 @@ class StrandViewComponent extends Component<{}, StrandViewComponentState> {
   render() {
     const {width, height, offset, waveStartN, factorLockM} = this.state;
     return <div className="Container">
+             {this.state.isWorking ? 
+              <div className="LoadingOverlay">
+                <div>Loading</div>
+                <div>
+                  <button className="LockButton" onClick={() => this.handleLockClick()}>{"Cancel"}</button>
+                </div>
+              </div> 
+             : ''}
              <div className="ControlBox">
               <label className="InputLabel">Starting Prime: </label>
               <input type='number' value={waveStartN} onInput={(ev: React.ChangeEvent<HTMLInputElement>) => this.handleStartNInput(ev)} />
               <label className="InputLabel">Triangular Number Multiple: </label>
               <input type='number' value={factorLockM} onInput={(ev: React.ChangeEvent<HTMLInputElement>) => this.handleFactorLockMInput(ev)} />
-              <button className="LockButton" onClick={() => this.handleLockClick()}>{this.state.isWorking ? "Cancel" : "Lock"}</button>
+              <button className="LockButton" onClick={() => this.handleLockClick()}>Lock</button>
               <button disabled={this.state.isWorking || (this.state.currentStrand as TriangularStrand) == null} className="LockButton" onClick={() => this.handleUnlockClick()}>Unlock</button>
               <div className="LockSequenceText">{this.state.currentStrand.toString()}</div>
               <div className="LockedFactors">{this.state.factorLockState.map(factorLockTest => <span className={factorLockTest.locked ? "LockedFactorItem" : "NotLockedFactorItem"}>{factorLockTest.divisor.toString()}</span>)}</div>
@@ -77,33 +86,40 @@ class StrandViewComponent extends Component<{}, StrandViewComponentState> {
         isWorking: false,
       });
     } else {
-      // Send data to worker
-      this.worker.postMessage(new TriangularStrand(BigInt(this.state.waveStartN), BigInt(this.state.factorLockM), this.state.currentStrand));
-      
-      this.setState({
-        isWorking: true,
-      });
-
-      // Listen for messages from the worker
-      this.worker.onmessage = (event) => {
-        const strandFactory = new StrandFactory();
-        const result = PrimeMath.calculateLockedPrimeFactors(BigInt(this.state.waveStartN), BigInt(this.state.factorLockM), 250, 0);
-        this.setState({
-          currentStrand: strandFactory.build(event.data),
-          offset: 0,
-          isWorking: false,
-          factorLockState: result,
-        });
-      };
-      
-      // Listen for any errors from the worker
-      this.worker.onerror = (event) => {
-          console.error("Worker error: ", event.message);
-          this.setState({
-            isWorking: false,
-          });
-      };
+      this.handleLoadRequest(new TriangularStrand(BigInt(this.state.waveStartN), BigInt(this.state.factorLockM), this.state.currentStrand), 0, 100);
     }
+  }
+
+  handleLoadRequest(strand:IStrand, offset:number, quantity:number): void {
+    // Send data to worker
+    this.worker.postMessage({
+      strand: strand,
+      offset: offset + quantity,
+    });
+
+    this.setState({
+      isWorking: true,
+    });
+
+    // Listen for messages from the worker
+    this.worker.onmessage = (event) => {
+      const strandFactory = new StrandFactory();
+      const result = PrimeMath.calculateLockedPrimeFactors(BigInt(this.state.waveStartN), BigInt(this.state.factorLockM), 250, 0);
+      this.setState({
+        currentStrand: strandFactory.build(event.data),
+        offset: offset,
+        isWorking: false,
+        factorLockState: result,
+      });
+    };
+
+    // Listen for any errors from the worker
+    this.worker.onerror = (event) => {
+        console.error("Worker error: ", event.message);
+        this.setState({
+          isWorking: false,
+        });
+    };
   }
 
   handleUnlockClick(): void {
@@ -128,25 +144,23 @@ class StrandViewComponent extends Component<{}, StrandViewComponentState> {
   }
 
   handleKeydown(ev: KeyboardEvent):void {
-    let offset = this.state.offset;
+    let desiredOffset = this.state.offset;
     if (ev.key === 'ArrowLeft') {
       // Left arrow key pressed
-      offset--;
+      desiredOffset--;
     } else if (ev.key === 'ArrowRight') {
       // Right arrow key pressed
-      offset++;
+      desiredOffset++;
     }
 
     const currentStrand = this.state.currentStrand;
-    if (currentStrand.getLine().length < (offset + 100)) {
-      currentStrand.loadUpTo(currentStrand.getLine().length + 100);
+    if (currentStrand.getLine().length < (desiredOffset + 100)) {
+      this.handleLoadRequest(currentStrand, desiredOffset, currentStrand.getLine().length + 100);
+    } else {
+      this.setState({
+        offset: Math.max(desiredOffset, 0),
+      });
     }
-
-    this.setState({
-      width: window.innerWidth,
-      height: window.innerHeight,
-      offset: Math.max(offset, 0),
-    });
   }
 
   handleResize(): void {

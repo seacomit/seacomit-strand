@@ -76,7 +76,6 @@ class PrimeMath {
     static calculateLockedPrimeFactors(startN:bigint, triangularMult:bigint, amount:number, offset:number): IFactorLockTest[] {
         this.loadMorePrimes(amount, offset);
         const factorLockTests = [];
-        const notLockedFactors = [startN];
 
         for (let i = 0; i < amount; i++) {
             const prime = BigInt(this.primeCache[i]);
