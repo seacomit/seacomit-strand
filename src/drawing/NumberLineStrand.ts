@@ -14,8 +14,9 @@ class NumberLineStrand implements IStrand {
         this.numberLine = [];
     }
 
-    loadUpTo(index: number) {
+    loadUpTo(index: number, progressFn:Function) {
         if (index >= this.numberLine.length) {
+          progressFn({isProgress: true, current: 0, total: index});
           const startingIndex = this.numberLine.length;
           const iterations = (index + 1) - this.numberLine.length;
           for (let i = 0; i < iterations; i++) {
@@ -25,6 +26,7 @@ class NumberLineStrand implements IStrand {
             } else {
               this.numberLine.push(this.addNumber(n));
             }
+            progressFn({isProgress: true, current: i, total: index});
           }
         }
     }

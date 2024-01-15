@@ -82,6 +82,11 @@ class PrimeMath {
             const partial = startN % prime;
             if (partial == 0n) {
                 // not locked, starting on a multiple
+                factorLockTests.push({
+                    remainder: partial,
+                    divisor: prime,
+                    locked: false,
+                });
             } else {
                 // need to run the sequence up to prime times( maybe only half because it mirrors?)
                 let locked = true;

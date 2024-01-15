@@ -8,7 +8,7 @@ self.onmessage = (e: MessageEvent<IMathWorkerRequestMessage>) => {
     // Reconstruct the strand
     const strandFactory = new StrandFactory();
     const strand = strandFactory.build(e.data.strand);
-    strand.loadUpTo(e.data.offset - 1);
+    strand.loadUpTo(e.data.offset - 1, self.postMessage);
     self.postMessage(strand);
 };
 

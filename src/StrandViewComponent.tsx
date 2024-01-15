@@ -17,6 +17,8 @@ interface StrandViewComponentState {
     factorLockM: number;
     currentStrand: IStrand;
     isWorking: boolean;
+    progressCurrent: number;
+    progressTotal: number;
     factorLockState: IFactorLockTest[];
 }
 
@@ -37,9 +39,11 @@ class StrandViewComponent extends Component<{}, StrandViewComponentState> {
       factorLockM: 2,
       currentStrand: new NumberLineStrand(),
       isWorking: false,
+      progressCurrent: 0,
+      progressTotal: 0,
       factorLockState: [],
     }
-    this.state.currentStrand.loadUpTo(99);
+    this.state.currentStrand.loadUpTo(99, () => {});
     this.worker = new Worker(new URL("./primes/MathWorker.ts", import.meta.url));
   }
 
@@ -48,7 +52,7 @@ class StrandViewComponent extends Component<{}, StrandViewComponentState> {
     return <div className="Container">
              {this.state.isWorking ? 
               <div className="LoadingOverlay">
-                <div>Loading</div>
+                <div>Loading: {this.state.progressCurrent}/{this.state.progressTotal}</div>
                 <div>
                   <button className="LockButton" onClick={() => this.handleLockClick()}>{"Cancel"}</button>
                 </div>
@@ -91,6 +95,8 @@ class StrandViewComponent extends Component<{}, StrandViewComponentState> {
   }
 
   handleLoadRequest(strand:IStrand, offset:number, quantity:number): void {
+    if (this.state.isWorking) return;
+    
     // Send data to worker
     this.worker.postMessage({
       strand: strand,
@@ -103,14 +109,21 @@ class StrandViewComponent extends Component<{}, StrandViewComponentState> {
 
     // Listen for messages from the worker
     this.worker.onmessage = (event) => {
-      const strandFactory = new StrandFactory();
-      const result = PrimeMath.calculateLockedPrimeFactors(BigInt(this.state.waveStartN), BigInt(this.state.factorLockM), 250, 0);
-      this.setState({
-        currentStrand: strandFactory.build(event.data),
-        offset: offset,
-        isWorking: false,
-        factorLockState: result,
-      });
+      if (event.data.isProgress) {
+        this.setState({
+          progressCurrent: event.data.current,
+          progressTotal: event.data.total,
+        });
+      } else {
+        const strandFactory = new StrandFactory();
+        const result = PrimeMath.calculateLockedPrimeFactors(BigInt(this.state.waveStartN), BigInt(this.state.factorLockM), 250, 0);
+        this.setState({
+          currentStrand: strandFactory.build(event.data),
+          offset: offset,
+          isWorking: false,
+          factorLockState: result,
+        });
+      }
     };
 
     // Listen for any errors from the worker

@@ -6,7 +6,7 @@ test('Number line strand can be constructed.', () => {
 
 test('Number line strand loads numbers correctly.', () => {
   const nls = new NumberLineStrand();
-  nls.loadUpTo(99); 
+  nls.loadUpTo(99, () => {}); 
   expect(nls.numberLine.length).toEqual(100);
   expect(nls.numberCache.size).toEqual(100);
 

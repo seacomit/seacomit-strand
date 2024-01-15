@@ -18,13 +18,16 @@ class TriangularStrand implements IStrand {
         this.numberLine = [];
     }
 
-    loadUpTo(index: number) {
+    loadUpTo(index: number, progressFn:Function) {
         if (index >= this.numberLine.length) {
+          const totalToLoad = index - (this.numberLine.length);
+          progressFn({isProgress: true, current: 0, total: totalToLoad});
           const arrayStartIndex = this.numberLine.length;
           const iterations = (index + 1) - this.numberLine.length;
           for (let i = 0; i < iterations; i++) {
             const triIndex = this.startIndex + PrimeMath.triangularN(BigInt(arrayStartIndex + i)) * this.multiplier;
             this.numberLine.push(this.baseStrand.get(triIndex));
+            progressFn({isProgress: true, current: i, total: totalToLoad});
           }
         }
     }

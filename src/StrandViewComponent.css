@@ -69,12 +69,12 @@
 }
 
 .LockedFactorItem {
-    color: aquamarine;
-    background-color: #32a852;
+    color: #9ad7fc;
+    background-color: #3385ff;
 }
 
 .NotLockedFactorItem {
-    color: #ff5e87;
+    color: #ff789a;
     background-color: #a83250;
 }
 

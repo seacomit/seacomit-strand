@@ -8,7 +8,7 @@ test('TriangularStrand can be constructed.', () => {
 
 test('TriangularStrand loads numbers correctly.', () => {
   const ts = new TriangularStrand(11n, 2n, new NumberLineStrand());
-  ts.loadUpTo(99);   
+  ts.loadUpTo(99, () => {});   
   expect(ts.numberLine.length).toEqual(100);
 
   for (let i = 0n; i < 100n; i++) {
