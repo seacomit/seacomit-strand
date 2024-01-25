@@ -20,7 +20,7 @@ export default function StrandViewComponent() {
   const [progressCurrent, setProgressCurrent] = useState(0);
   const [progressTotal, setProgressTotal] = useState(0);
   const [factorLockState, setFactorLockState] = useState<IFactorLockTest[]>([]);
-  const [worker, setWorker] = useState<Worker>(new Worker(new URL("./primes/MathWorker.ts", import.meta.url)));
+  const [worker, setWorker] = useState<Worker|null>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -44,8 +44,6 @@ export default function StrandViewComponent() {
       }
     };
 
-    currentStrand.loadUpTo(99, () => {});
-    setCurrentStrand(currentStrand);
     window.addEventListener('resize', handleResize);
     window.addEventListener('keydown', handleKeydown);
     return (() => {
@@ -55,17 +53,22 @@ export default function StrandViewComponent() {
   });
   
   function handleLoadRequest(strand:IStrand, offset:number, quantity:number): void {
-    if (isWorking || !worker) return;
+    if (isWorking) return;
+    if (worker) {
+      worker.terminate();
+    }
+    const theWorker = new Worker(new URL("./primes/MathWorker.ts", import.meta.url));
     // Send data to worker
-    worker.postMessage({
+    theWorker.postMessage({
       strand: strand,
       offset: offset + quantity,
     });
 
     setIsWorking(true);
+    setWorker(theWorker);
 
     // Listen for messages from the worker
-    worker.onmessage = (event) => {
+    theWorker.onmessage = (event) => {
       if (event.data.isProgress) {
         setProgressCurrent(event.data.current);
         setProgressTotal(event.data.total);
@@ -80,7 +83,7 @@ export default function StrandViewComponent() {
     };
 
     // Listen for any errors from the worker
-    worker.onerror = (event) => {
+    theWorker.onerror = (event) => {
         console.error("Worker error: ", event.message);
         setIsWorking(false);
     };
@@ -90,8 +93,9 @@ export default function StrandViewComponent() {
       if (isWorking) {
           if (worker) {
               worker.terminate();
+              setWorker(null);
           }
-          setWorker(new Worker(new URL("./primes/MathWorker.ts", import.meta.url)));
+          setIsWorking(false);
       } else {
           handleLoadRequest(new TriangularStrand(BigInt(waveStartN), BigInt(factorLockM), currentStrand), 0, 100);
       }

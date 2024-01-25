@@ -12,6 +12,7 @@ class NumberLineStrand implements IStrand {
     constructor() {
         this.numberCache = new Map<bigint, INumberProperties>();
         this.numberLine = [];
+        this.loadUpTo(100, () => {});
     }
 
     loadUpTo(index: number, progressFn:Function) {
