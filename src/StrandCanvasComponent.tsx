@@ -1,43 +1,31 @@
-import { Component, createRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import NumberLineRenderer from './drawing/NumberLineRenderer';
 import IStrand from './drawing/IStrand';
 
-interface StrandCanvasComponentProps {
+type StrandCanvasComponentProps = {
   width: number;
   height: number;
   offset: number;
   strand: IStrand;
-}
+};
 
-class StrandCanvasComponent extends Component<StrandCanvasComponentProps> {
-  canvasRef = createRef<HTMLCanvasElement>();
-  numberLineRenderer = new NumberLineRenderer();
+export default function StrandCanvasComponent({width,  height,  offset,  strand}: StrandCanvasComponentProps) {
+  const [numberLineRenderer, setNumberLineRenderer] = useState(new NumberLineRenderer());
+  const ref = useRef<HTMLCanvasElement>(null);
 
-  render() {
-    return <canvas ref={this.canvasRef} data-testid="strand-canvas" />;
-  }
-
-  componentDidMount(): void {
-    this.redrawStrand();
-  }
-
-  componentDidUpdate(): void {
-    this.redrawStrand();
-  }
-
-  redrawStrand() {
-    const canvas = this.canvasRef.current;
+  useEffect(() => {
+    const canvas = ref.current;
     if (canvas) {
-      const {width, height, offset, strand} = this.props;
       canvas.width = width;
       canvas.height = height;
-      
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        this.numberLineRenderer.render(strand.getLine(), offset, ctx, canvas.width, canvas.height);
+        if (strand.getLine().length > 0) {
+          numberLineRenderer.render(strand.getLine(), offset, ctx, width, height);
+        }
       }
     }
-  }
-}
+  }, [width, height, offset, strand]);
 
-export default StrandCanvasComponent;
+  return <canvas ref={ref} data-testid="strand-canvas" />;
+};
